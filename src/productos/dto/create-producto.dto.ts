@@ -5,7 +5,7 @@ import {
   IsOptional,
   IsBoolean,
   Min,
-  MaxLength
+  MaxLength,
 } from 'class-validator';
 export class CreateProductoDto {
   @IsString()
