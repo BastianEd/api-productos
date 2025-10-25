@@ -13,6 +13,9 @@ async function bootstrap() {
   );
   const port = process.env.PORT || 3000;
   await app.listen(port);
-  console.log(' Aplicación corriendo en: http://localhost:' + port);
+  //http://localhost:3000/api/v1/productos/
+  console.log(
+    ' Aplicación corriendo en: http://localhost:' + port + '/api/v1/productos/',
+  );
 }
 bootstrap();
