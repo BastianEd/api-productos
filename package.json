@@ -1,8 +1,8 @@
 {
   "name": "api-productos",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "API de Productos con NestJS",
+  "author": "BastianEd",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
