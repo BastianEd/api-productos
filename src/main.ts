@@ -1,6 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api/v1');
@@ -11,11 +13,28 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  // --- Configuración de Swagger ---
+  const config = new DocumentBuilder()
+    .setTitle('API de Productos')
+    .setDescription(
+      'Una API REST para gestionar productos, construida con NestJS.',
+    )
+    .setVersion('1.0')
+    .addTag('productos', 'Operaciones relacionadas con productos')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api-docs', app, document); // La ruta para acceder a la UI de Swagger
+
   const port = process.env.PORT || 3000;
   await app.listen(port);
-  //http://localhost:3000/api/v1/productos/
+
   console.log(
-    ' Aplicación corriendo en: http://localhost:' + port + '/api/v1/productos/',
+    `Aplicación corriendo en: http://localhost:${port}/api/v1/productos/`,
+  );
+  console.log(
+    `Documentación de la API disponible en: http://localhost:${port}/api-docs`,
   );
 }
 bootstrap();
