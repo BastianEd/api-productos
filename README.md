@@ -25,6 +25,21 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+### Variables de Entorno
+
+```env
+# Database Configuration for Laragon (MySQL/MariaDB)
+DB_TYPE=mysql
+DB_HOST=localhost
+DB_PORT=3306
+DB_USERNAME=root
+DB_PASSWORD= TU PASSWORD AQUI DE TU BASE DE DATOS
+DB_NAME=db_productos
+
+# App Configuration
+PORT=3000
+```
+
 ## Project setup
 
 ```bash
