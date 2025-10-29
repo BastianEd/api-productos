@@ -1,3 +1,5 @@
+// bastianed/api-productos/api-productos-1ccc975c1ebbadebcfe8eb26607a314ce689dbe9/src/productos/productos.service.ts
+
 import {
   Injectable,
   NotFoundException,
@@ -11,13 +13,12 @@ import { Producto } from './entities/producto.entity';
 
 @Injectable()
 export class ProductosService {
-  // 1. Inyección del Repositorio
   constructor(
-    @InjectRepository(Producto) //
+    @InjectRepository(Producto)
     private readonly productoRepository: Repository<Producto>,
   ) {}
 
-  // 2. Metodo para Crear un Producto
+  // ... (métodos create, findAll, findOne, update se mantienen igual) ...
   async create(createProductoDto: CreateProductoDto): Promise<Producto> {
     try {
       const producto = this.productoRepository.create(createProductoDto);
@@ -28,12 +29,10 @@ export class ProductosService {
     }
   }
 
-  // 3. Metodo para Obtener todos los Productos
   async findAll(): Promise<Producto[]> {
     return await this.productoRepository.find();
   }
 
-  // 4. Metodo para Obtener un Producto por ID
   async findOne(id: number): Promise<Producto> {
     const producto = await this.productoRepository.findOneBy({ id });
     if (!producto) {
@@ -42,7 +41,6 @@ export class ProductosService {
     return producto;
   }
 
-  // 5. Metodo para Actualizar un Producto
   async update(
     id: number,
     updateProductoDto: UpdateProductoDto,
@@ -59,9 +57,18 @@ export class ProductosService {
     return await this.productoRepository.save(producto);
   }
 
-  // 6. Metodo para Eliminar un Producto (Soft Delete)
+  /**
+   * 6. Metodo para Eliminar un Producto (Soft Delete)
+   * Esta versión optimizada realiza una única operación en la base de datos
+   * y verifica si alguna fila fue afectada para asegurar que la eliminación fue exitosa.
+   */
   async remove(id: number): Promise<void> {
-    await this.findOne(id);
-    await this.productoRepository.softDelete(id);
+    const result = await this.productoRepository.softDelete(id);
+
+    // Si la propiedad 'affected' es 0, significa que no se encontró
+    // ningún producto con ese ID para eliminar.
+    if (result.affected === 0) {
+      throw new NotFoundException(`Producto con ID ${id} no encontrado`);
+    }
   }
 }

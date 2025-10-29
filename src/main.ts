@@ -5,6 +5,16 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // --- Habilitar CORS de forma segura ---
+  app.enableCors({
+    // Origen permitido (tu frontend de React en desarrollo)
+    origin: 'http://localhost:5173',
+    // Métodos HTTP que permites desde el frontend
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    // Permite que el frontend envíe credenciales (como cookies o headers de autenticación)
+    credentials: true,
+  });
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(
     new ValidationPipe({

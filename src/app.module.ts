@@ -19,6 +19,7 @@ import { ProductosModule } from './productos/productos.module';
       database: process.env.DB_NAME,
       autoLoadEntities: true,
       synchronize: true,
+      logging: true,
     }),
     ProductosModule,
   ],
