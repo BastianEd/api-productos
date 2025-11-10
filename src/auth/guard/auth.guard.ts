@@ -6,23 +6,34 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { jwtConstants } from '../constants/jwt.constant';
+
+/**
+ * 1. Definimos la forma de nuestro Payload de JWT.
+ * Esto debe coincidir con lo que pones en `auth.service.ts`
+ * al firmar el token (sub, email, name, rol).
+ */
+interface JwtPayload {
+  sub: number;
+  email: string;
+  name: string;
+  rol: string;
+}
+
+/**
+ * 2. Extendemos la Request de Express para añadir
+ * la propiedad `user`, que ahora será de tipo `JwtPayload`.
+ */
+interface AuthRequest extends Request {
+  user: JwtPayload;
+}
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(
-    // Inyectamos el JwtService (que hicimos 'global' en el módulo)
-    private readonly jwtService: JwtService,
-  ) {}
+  constructor(private readonly jwtService: JwtService) {}
 
-  /**
-   * Método principal que NestJS ejecuta para validar el acceso.
-   */
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    // Obtenemos el objeto 'request' de la petición HTTP
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<AuthRequest>();
 
-    // Extraemos el token del header
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
@@ -32,33 +43,20 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      // 1. Verificamos la validez del token (firma y expiración)
-      // Si falla (ej. token expirado o firma inválida), lanzará un error.
-      const payload = await this.jwtService.verifyAsync(token, {
-        secret: jwtConstants.secret,
-      });
-
-      // 2. Si el token es válido, adjuntamos el payload (datos del usuario)
-      // al objeto 'request'. Esto nos permite acceder a 'req.user'
-      // en cualquier controlador que use este Guard.
+      const payload = await this.jwtService.verifyAsync<JwtPayload>(token);
       request.user = payload;
-    } catch (error) {
-      // Capturamos cualquier error de verificación
+    } catch {
+      // 3. (CORREGIDO) Eliminamos la variable del catch.
+      // Esta sintaxis de 'catch' vacío es moderna y
+      // le dice a ESLint que intencionalmente no nos importa el error.
       throw new UnauthorizedException('Token inválido o expirado');
     }
 
-    // 3. Si todo sale bien, permitimos el acceso
     return true;
   }
 
-  /**
-   * Helper para extraer el token del header "Authorization: Bearer <token>"
-   */
   private extractTokenFromHeader(request: Request): string | undefined {
-    // Obtenemos 'Bearer <token>' y lo separamos
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
-
-    // Si no es tipo 'Bearer', devolvemos undefined
     return type === 'Bearer' ? token : undefined;
   }
 }

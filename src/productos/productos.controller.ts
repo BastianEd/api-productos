@@ -21,6 +21,8 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { Producto } from './entities/producto.entity';
+import { AuthGuard } from '../auth/guard/auth.guard';
+import { UseGuards } from '@nestjs/common';
 
 @ApiTags('productos')
 @Controller('productos')
@@ -29,6 +31,7 @@ export class ProductosController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Crear un nuevo producto' })
   @ApiBody({ type: CreateProductoDto })
   @ApiResponse({
@@ -74,6 +77,7 @@ export class ProductosController {
     description: 'El producto ha sido actualizado.',
     type: Producto,
   })
+  @UseGuards(AuthGuard)
   @ApiResponse({ status: 404, description: 'Producto no encontrado.' })
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -83,6 +87,7 @@ export class ProductosController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Eliminar un producto (soft delete)' })
   @ApiParam({ name: 'id', description: 'ID del producto a eliminar' })
